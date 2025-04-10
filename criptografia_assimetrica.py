@@ -1,14 +1,16 @@
-from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.hazmat.primitives import serialization
+from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_OAEP
+import base64
 
-# Gerar par de chaves
-private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
-public_key = private_key.public_key()
+chaves = RSA.generate(2048)
+chave_publica = chaves.publickey()
 
-# Serializar chave pública
-pem = public_key.public_bytes(
-    encoding=serialization.Encoding.PEM,
-    format=serialization.PublicFormat.SubjectPublicKeyInfo
-)
-print("Chave pública:", pem)
+mensagem = b'Segredo importante!'
+cifra_rsa = PKCS1_OAEP.new(chave_publica)
+criptografada = cifra_rsa.encrypt(mensagem)
 
+decifra_rsa = PKCS1_OAEP.new(chaves)
+mensagem_decifrada = decifra_rsa.decrypt(criptografada)
+
+print("Mensagem RSA criptografada (Base64):", base64.b64encode(criptografada).decode())
+print("Mensagem decifrada:", mensagem_decifrada.decode())
